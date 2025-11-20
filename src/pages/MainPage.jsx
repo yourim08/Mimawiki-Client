@@ -24,10 +24,10 @@ const Header = styled.header`
   background-color: #558B5A;
   color: white;
   padding: 0 20px;
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 100;
-  width: 100%;
+  width: 1920px;
   box-sizing: border-box;
   height: 60px;
 `;
@@ -88,7 +88,8 @@ const NotificationBadge = styled.span`
 const MainLayout = styled.main`
   display: flex;
   justify-content: center;
-  padding: 30px 20px;
+  padding: 40px 20px;
+  padding-left: 330px;
 `;
 
 const ContentWrapper = styled.div`

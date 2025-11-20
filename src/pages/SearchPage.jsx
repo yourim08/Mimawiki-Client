@@ -23,10 +23,10 @@ const Header = styled.header`
   background-color: #558B5A;
   color: white;
   padding: 0 20px;
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 100;
-  width: 100%;
+  width: 1920px;
   box-sizing: border-box;
   height: 60px;
 `;
@@ -87,7 +87,9 @@ const NotificationBadge = styled.span`
 const MainLayout = styled.main`
   display: flex;
   justify-content: center;
-  padding: 30px 20px;
+  padding: 40px 20px;
+  width: 1300px;
+  padding-left: 310px;
 `;
 
 const ContentWrapper = styled.div`
@@ -100,7 +102,6 @@ const ContentWrapper = styled.div`
 const LeftColumn = styled.section`
   flex: 3;
 `;
-
 const RightColumn = styled.aside`
   flex: 1;
   display: flex;

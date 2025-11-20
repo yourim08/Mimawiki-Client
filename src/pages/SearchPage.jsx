@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import WikiDescription from '../components/WikiDescription';
 import PostList from '../components/PostList';
 import UserProfile from '../components/UserProfile';
 import TopTenRanking from '../components/TopTenRanking';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-// --- 스타일 (기존 유지) ---
+// --- 스타일 정의 (MainPage와 동일) ---
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -109,39 +108,38 @@ const RightColumn = styled.aside`
   gap: 30px;
 `;
 
-const MainPage = () => {
+const SearchPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
-  const [inputValue, setInputValue] = useState('');   
+  // URL에서 keyword 가져오기 (?keyword=검색어)
+  const keyword = searchParams.get('keyword') || ''; 
+
+  const [inputValue, setInputValue] = useState(keyword);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetchUnreadCount();
-  }, []);
+    setInputValue(keyword); // 검색어가 바뀌면 인풋창도 업데이트
+  }, [keyword]);
 
   const fetchUnreadCount = async () => {
     const token = localStorage.getItem('authToken');
     if (!token) return;
-
     try {
       const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/suggestions/unread-count', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       if (response.ok) {
         const json = await response.json();
         setUnreadCount(json.data);
       }
-    } catch (error) {
-      console.error("알림 개수 조회 실패:", error);
-    }
+    } catch (error) { console.error(error); }
   };
 
-  // [수정] 검색 실행 시 SearchPage로 이동
+  // 검색 실행 (다시 현재 페이지로 navigate)
   const handleSearch = () => {
-    if (inputValue.trim()) {
-      navigate(`/search?keyword=${encodeURIComponent(inputValue)}`);
-    }
+    navigate(`/search?keyword=${encodeURIComponent(inputValue)}`);
   };
 
   const handleKeyDown = (e) => {
@@ -174,9 +172,7 @@ const MainPage = () => {
           <BellWrapper onClick={() => navigate('/suggestions')}>
             <span style={{ fontSize: '1.2em' }}>🔔</span>
             {unreadCount > 0 && (
-              <NotificationBadge>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </NotificationBadge>
+              <NotificationBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotificationBadge>
             )}
           </BellWrapper>
 
@@ -195,10 +191,13 @@ const MainPage = () => {
       <MainLayout>
         <ContentWrapper>
           <LeftColumn>
-            {/* 메인에서는 설명 컴포넌트 표시 */}
-            <WikiDescription />
-            {/* 검색어가 없으므로 전체 목록 표시 */}
-            <PostList />
+            {/* WikiDescription(설명) 컴포넌트 제거됨 */}
+            
+            {/* PostList에 검색어를 전달 */}
+            <div style={{marginBottom: '20px', fontSize: '18px', fontWeight: 'bold'}}>
+               "{keyword}" 검색 결과
+            </div>
+            <PostList searchKeyword={keyword} />
           </LeftColumn>
           <RightColumn>
             <UserProfile />
@@ -210,4 +209,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default SearchPage;

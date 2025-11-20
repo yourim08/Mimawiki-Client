@@ -10,6 +10,8 @@ import WritePage from './pages/WritePage';
 import MyPage from './pages/MyPage';
 import EditPage from './pages/EditPage';
 import PostDetailPage from './pages/PostDetailPage';
+import SuggestionPage from './pages/SuggestionPage'; 
+import SearchPage from './pages/SearchPage'; 
 
   
 
@@ -24,6 +26,8 @@ function App() {
         <Route path="/write" element={<WritePage/>}/>
         <Route path="/myPage" element={<MyPage/>}/>
         <Route path="/edit/:keyword" element={<EditPage />} />
+        <Route path="/suggestions" element={<SuggestionPage />} />
+        <Route path="/search" element={<SearchPage />} />
       </Routes>
     </ThemeProvider>
   );

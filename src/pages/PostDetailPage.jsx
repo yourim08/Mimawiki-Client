@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 // --- 스타일 정의 ---
 
-// 1. 전체 배경 (회색)
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -14,7 +13,6 @@ const PageContainer = styled.div`
   background-color: #f7f7f7;
 `;
 
-// 2. 상단 헤더 (흰색, 가로 100%)
 const TopHeader = styled.div`
   width: 100%;
   height: 64px;
@@ -22,10 +20,10 @@ const TopHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px; /* 좌우 여백 */
+  padding: 0 20px;
   box-sizing: border-box;
   border-bottom: 1px solid #e0e0e0;
-  position: sticky; /* 스크롤 시 상단 고정 (선택사항) */
+  position: sticky;
   top: 0;
   z-index: 100;
 `;
@@ -72,7 +70,7 @@ const SearchBarWrapper = styled.div`
   padding: 0 15px;
   
   @media (max-width: 768px) {
-    display: none; /* 모바일에서는 검색창 숨김 (공간 부족 시) */
+    display: none;
   }
 `;
 
@@ -85,14 +83,13 @@ const SearchInput = styled.input`
   margin-left: 8px;
 `;
 
-// 3. 초록색 메뉴바 (가로 100%)
 const GreenNavBar = styled.div`
   width: 100%;
   height: 48px;
   background-color: #009688;
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* 우측 정렬 */
+  justify-content: flex-end;
   padding: 0 20px;
   box-sizing: border-box;
   gap: 20px;
@@ -101,30 +98,52 @@ const GreenNavBar = styled.div`
   font-weight: 500;
 `;
 
-// 4. 본문 래퍼 (가운데 정렬 핵심)
+// [NEW] 종 아이콘 래퍼 (클릭 가능)
+const BellWrapper = styled.div`
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+// [NEW] 알림 숫자 배지
+const NotificationBadge = styled.span`
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: #FF5252;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 12px;
+  text-align: center;
+  border: 1px solid white;
+`;
+
 const ContentWrapper = styled.div`
   width: 100%;
   flex: 1;
   display: flex;
-  justify-content: center; /* 가로 중앙 정렬 */
-  padding: 40px 20px;      /* 상하 40px, 좌우 20px 여백 */
+  justify-content: center;
+  padding: 40px 20px;
   box-sizing: border-box;
 `;
 
-// 5. 흰색 카드 (문서 모양)
 const ArticleCard = styled.div`
   width: 100%;
-  max-width: 850px; /* [핵심] 너비를 850px로 제한하여 문서 느낌 냄 */
+  max-width: 850px;
   background-color: white;
-  border-radius: 16px; /* 둥근 모서리 */
-  padding: 60px;       /* 내부 여백 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+  border-radius: 16px;
+  padding: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   min-height: 600px;
 
   @media (max-width: 768px) {
-    padding: 30px; /* 모바일에서는 내부 여백 줄임 */
+    padding: 30px;
   }
 `;
 
@@ -185,7 +204,6 @@ const EditButton = styled.button`
   }
 `;
 
-// 본문 내용 (HTML 태그 적용)
 const ArticleContent = styled.div`
   font-size: 16px;
   line-height: 1.8;
@@ -194,7 +212,6 @@ const ArticleContent = styled.div`
   margin-bottom: 60px;
   min-height: 200px;
 
-  /* 마크다운/HTML 태그 스타일 */
   h1, h2, h3 { margin-top: 30px; margin-bottom: 15px; color: #111; }
   p { margin-bottom: 16px; word-break: keep-all; }
   ul, ol { padding-left: 24px; margin-bottom: 16px; }
@@ -211,7 +228,6 @@ const ArticleContent = styled.div`
   strong { font-weight: 700; color: #000; }
 `;
 
-// 하단 영역 (태그 + 버튼)
 const ArticleFooter = styled.div`
   margin-top: auto;
   display: flex;
@@ -219,6 +235,7 @@ const ArticleFooter = styled.div`
   align-items: center;
   padding-top: 30px;
   border-top: 1px solid #f0f0f0;
+  margin-bottom: 40px; /* 제안하기 박스와의 간격 */
 `;
 
 const TagList = styled.div`
@@ -270,6 +287,63 @@ const LikeButton = styled.button`
   }
 `;
 
+// [NEW] 제안하기(조언) 영역 스타일
+const SuggestionBox = styled.div`
+  background-color: #F9F9F9;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 20px;
+`;
+
+const SuggestionHeader = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const SuggestionInput = styled.textarea`
+  width: 100%;
+  height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #009688;
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: #009688;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  float: right; /* 오른쪽 정렬 */
+
+  &:hover {
+    background-color: #00796B;
+  }
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
 const PostDetailPage = () => {
   const { keyword } = useParams();
   const navigate = useNavigate();
@@ -277,15 +351,57 @@ const PostDetailPage = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   
-  // API 중복 호출 방지
+  // [NEW] 제안 내용 상태
+  const [suggestionContent, setSuggestionContent] = useState('');
+  // [NEW] 안 읽은 알림 개수 상태
+  const [unreadCount, setUnreadCount] = useState(0);
+  
   const fetchLock = useRef(false);
 
   useEffect(() => {
     if (fetchLock.current) return;
     fetchLock.current = true;
-    fetchArticle();
+    
+    // [수정] 알림 개수 조회(fetchUnreadCount) 추가
+    Promise.all([fetchArticle(), fetchCurrentUser(), fetchUnreadCount()]);
   }, [keyword]);
+
+  const fetchCurrentUser = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/profile/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        setCurrentUser(json.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user info", error);
+    }
+  };
+
+  // [NEW] 안 읽은 알림 개수 조회 API
+  const fetchUnreadCount = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/suggestions/unread-count', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        setUnreadCount(json.data); // API가 숫자를 반환
+      }
+    } catch (error) {
+      console.error("Failed to fetch unread count", error);
+    }
+  };
 
   const fetchArticle = async () => {
     setLoading(true);
@@ -357,6 +473,44 @@ const PostDetailPage = () => {
     }
   };
 
+  // [NEW] 제안하기 제출 핸들러
+  const handleSuggestionSubmit = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+    
+    if (!suggestionContent.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8080/api/mima.wiki/w/${encodeURIComponent(keyword)}/suggestions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ content: suggestionContent })
+        }
+      );
+
+      if (response.ok) {
+        alert('작성자에게 수정 제안(조언)을 보냈습니다.');
+        setSuggestionContent(''); // 입력창 초기화
+      } else {
+        alert('제안 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Suggestion Error:', error);
+      alert('오류가 발생했습니다.');
+    }
+  };
+
   if (loading) return (
     <PageContainer style={{ justifyContent: 'center' }}>
       <div style={{color: '#888'}}>문서 불러오는 중...</div>
@@ -372,7 +526,6 @@ const PostDetailPage = () => {
 
   return (
     <PageContainer>
-      {/* 1. 상단 헤더 */}
       <TopHeader>
         <HeaderLeft>
           <BackArrow onClick={() => navigate(-1)}>←</BackArrow>
@@ -385,16 +538,20 @@ const PostDetailPage = () => {
         </SearchBarWrapper>
       </TopHeader>
 
-      {/* 2. 메뉴바 */}
       <GreenNavBar>
         <span onClick={() => navigate('/main')} style={{cursor:'pointer'}}>메인피드</span>
-        <span>🔔 알림</span>
+        
+        {/* [수정] 종 아이콘 + 알림 배지 */}
+        <BellWrapper onClick={() => navigate('/suggestions')}>
+          <span>🔔</span>
+          {unreadCount > 0 && (
+            <NotificationBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotificationBadge>
+          )}
+        </BellWrapper>
       </GreenNavBar>
 
-      {/* 3. 본문 영역 (중앙 정렬) */}
       <ContentWrapper>
         <ArticleCard>
-          {/* 카드 헤더 */}
           <CardHeader>
             <TitleSection>
               <ArticleTitle>{article.keyword}</ArticleTitle>
@@ -410,17 +567,18 @@ const PostDetailPage = () => {
               </MetaInfo>
             </TitleSection>
 
-            <EditButton onClick={() => navigate(`/edit/${keyword}`)}>
-              ✎ 수정
-            </EditButton>
+            {/* 작성자 본인일 때만 '수정' 버튼 표시 */}
+            {currentUser && article.authorName === currentUser.name && (
+              <EditButton onClick={() => navigate(`/edit/${keyword}`)}>
+                ✎ 수정
+              </EditButton>
+            )}
           </CardHeader>
 
-          {/* 본문 내용 (HTML 태그 해석) */}
           <ArticleContent 
             dangerouslySetInnerHTML={{ __html: article.content }} 
           />
 
-          {/* 카드 푸터 */}
           <ArticleFooter>
             <TagList>
               {article.tags && article.tags.map((tag, i) => (
@@ -438,6 +596,23 @@ const PostDetailPage = () => {
               </LikeButton>
             </ActionGroup>
           </ArticleFooter>
+
+          {/* [NEW] 작성자가 아닐 때 '수정 제안(조언)' 박스 표시 */}
+          {currentUser && article.authorName !== currentUser.name && (
+            <SuggestionBox>
+              <SuggestionHeader>💡 수정 제안 / 조언하기</SuggestionHeader>
+              <SuggestionInput 
+                placeholder="이 문서에 대해 수정할 점이나 조언을 남겨주세요. 작성자에게 전달됩니다."
+                value={suggestionContent}
+                onChange={(e) => setSuggestionContent(e.target.value)}
+              />
+              <div style={{ overflow: 'hidden' }}>
+                <SubmitButton onClick={handleSuggestionSubmit}>
+                  보내기
+                </SubmitButton>
+              </div>
+            </SuggestionBox>
+          )}
 
         </ArticleCard>
       </ContentWrapper>

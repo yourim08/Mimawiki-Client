@@ -1,0 +1,24 @@
+import { useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
+import LoginPage from './pages/LoginPage'
+import './App.css'
+import { ThemeProvider } from 'styled-components';
+import theme from './styles/theme';
+import SignUp from './pages/SignUp';
+import MainPage from './pages/MainPage';
+import WritePage from './pages/WritePage';
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/signUp" element={<SignUp />} />
+        <Route path="/main" element={<MainPage />} /> 
+        <Route path="/write" element={<WritePage/>}/>
+      </Routes>
+    </ThemeProvider>
+  );
+}
+
+export default App

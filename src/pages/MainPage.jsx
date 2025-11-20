@@ -20,16 +20,17 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const Header = styled.header`
+  margin: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #558B5A; /* 녹색 헤더 배경 */
   color: white;
   padding: 0 20px; /* 오른쪽 패딩을 20px에서 50px로 늘림 */
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 100;
-  width: 98vw;
+  width: 100vw;
   height: ${props => props.theme.vh(60)};
 `;
 
@@ -65,7 +66,8 @@ const HeaderPlaceholder = styled.div`
   
   /* 마이페이지/알림 종 모양 아이콘 영역 */
   span {
-    margin-right: 15px;
+    padding-right: 10px;
+    margin-right: 50px;
     cursor: pointer;
     font-size: 18px; /* 아이콘 대신 임시 텍스트 */
   }
@@ -78,12 +80,13 @@ const HeaderPlaceholder = styled.div`
 const MainLayout = styled.main`
   display: flex;
   justify-content: center;
-  padding: 30px 20px;
+  padding: 20px 30px;
+  padding-left: 300px;
 `;
 
 const ContentWrapper = styled.div`
   width: 100%;
-  max-width: 1200px;
+  max-width: 1500px;
   display: flex;
   gap: 30px;
 `;

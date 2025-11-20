@@ -51,25 +51,34 @@ const RankingItem = styled.li`
 const TopTenRanking = () => {
   const [ranking, setRanking] = useState([]);
 
-  useEffect(() => {
-    const fetchRanking = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/chart');
-        if (!response.ok) throw new Error('API 호출 실패');
-        const data = await response.json();
-        // viewCount 기준 내림차순으로 정렬하고 상위 10개만
-        const topTen = data
-          .sort((a, b) => b.viewCount - a.viewCount)
-          .slice(0, 10)
-          .map(item => item.keyword);
-        setRanking(topTen);
-      } catch (error) {
-        console.error('Ranking fetch error:', error);
-      }
-    };
+useEffect(() => {
+  const fetchRanking = async () => {
+    try {
+      const token = localStorage.getItem('authToken'); // 로그인 후 저장된 토큰
+      const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/chart', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    fetchRanking();
-  }, []);
+      if (!response.ok) throw new Error(`API 호출 실패: ${response.status}`);
+      
+      const data = await response.json();
+      const topTen = data.data
+        .sort((a, b) => b.viewCount - a.viewCount)
+        .slice(0, 10)
+        .map(item => item.keyword);
+      
+      setRanking(topTen);
+    } catch (error) {
+      console.error('Ranking fetch error:', error);
+    }
+  };
+
+  fetchRanking();
+}, []);
+
 
   return (
     <RankingBox>

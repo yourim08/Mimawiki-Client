@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-
+// ===============================================
+// TagInput & MarkdownPreviewer 그대로 재사용
+// ===============================================
 // Firebase/Auth 관련 Mockup Data 및 함수 (필수 요소이므로 포함)
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -275,23 +277,17 @@ const MarkdownPreviewer = ({ content }) => {
         />
     );
 };
-
 // ===============================================
-// 3. WriteForm Component
-// 글쓰기 입력 폼과 미리보기를 포함하는 주요 레이아웃
+// EditForm Component
 // ===============================================
-
-const WriteForm = ({ title, setTitle, tags, setTags, content, setContent, onCancel, onSubmit }) => {
-
-    const handleContentChange = (e) => {
-        setContent(e.target.value);
-    };
+const EditForm = ({ title, setTitle, tags, setTags, content, setContent, onCancel, onSubmit }) => {
+    const handleContentChange = (e) => setContent(e.target.value);
 
     return (
-        <div style={{ backgroundColor: '#ffffff', padding: '2rem', borderRadius: '0.75rem', border: '1px solid #f7fafc', width: '100%', paddingLeft: '94px' }}> {/* width: '100%' 추가 */}
-            <h1 style={{ fontSize: '2.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '2rem' }}>새 글 작성</h1>
+        <div style={{ backgroundColor: '#ffffff', padding: '2rem', borderRadius: '0.75rem', border: '1px solid #f7fafc', width: '100%', paddingLeft: '94px' }}>
+            <h1 style={{ fontSize: '2.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '2rem' }}>글 수정</h1>
 
-            {/* 제목 입력 */}
+            {/* 제목 */}
             <input
                 type="text"
                 placeholder="제목을 입력하세요"
@@ -305,41 +301,35 @@ const WriteForm = ({ title, setTitle, tags, setTags, content, setContent, onCanc
                     marginBottom: '1.5rem',
                     borderBottom: '2px solid #e2e8f0',
                     outline: 'none',
-                    transition: 'border-color 0.2s ease-in-out',
                     borderRadius: '0.25rem',
-                    color: '#1a202c', // 글자색 블랙 적용
-                    backgroundColor: '#ffffff', // 배경색 화이트 적용
+                    color: '#1a202c',
+                    backgroundColor: '#ffffff',
                 }}
                 onFocus={(e) => e.target.style.borderBottomColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderBottomColor = '#e2e8f0'}
             />
 
-            {/* 태그 입력 */}
+            {/* 태그 */}
             <div style={{ marginBottom: '2rem' }}>
                 <TagInput tags={tags} setTags={setTags} />
             </div>
 
-            {/* 마크다운 에디터 및 미리보기 분할 영역 (클래스를 추가하여 CSS 미디어 쿼리로 반응형 처리) */}
+            {/* 마크다운 입력 + 미리보기 */}
             <div
                 className="split-area"
                 style={{
                     display: 'flex',
-                    flexDirection: 'column', // 기본은 수직 (모바일/좁은 화면)
+                    flexDirection: 'column',
                     gap: '1.5rem',
                     height: '70vh',
                     minHeight: '500px'
                 }}
             >
-                {/* 1. 마크다운 입력 영역 (왼쪽/위) */}
+                {/* 왼쪽: 기존 글 내용 */}
                 <div style={{ flex: '1', minWidth: '0', display: 'flex', flexDirection: 'column' }}>
                     <label style={{ fontSize: '1.125rem', fontWeight: '600', color: '#4a5568', marginBottom: '0.5rem' }}>마크다운 입력</label>
                     <textarea
-                        placeholder={`글 내용을 마크다운으로 작성하세요. (예시:
-# 헤딩1
-**굵게**
-- 목록 아이템
-> 인용문
-\`인라인 코드\``}
+                        placeholder="글 내용을 마크다운으로 작성하세요"
                         value={content}
                         onChange={handleContentChange}
                         style={{
@@ -350,7 +340,6 @@ const WriteForm = ({ title, setTitle, tags, setTags, content, setContent, onCanc
                             borderRadius: '0.5rem',
                             resize: 'none',
                             outline: 'none',
-                            // ERROR FIX: 쉼표로 분리된 font-family 리스트를 단일 문자열로 감쌌습니다.
                             fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
                             fontSize: '0.875rem',
                             boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
@@ -365,18 +354,18 @@ const WriteForm = ({ title, setTitle, tags, setTags, content, setContent, onCanc
                     />
                 </div>
 
-                {/* 2. 마크다운 미리보기 영역 (오른쪽/아래) */}
+                {/* 오른쪽: 미리보기 */}
                 <div style={{ flex: '1', minWidth: '0', display: 'flex', flexDirection: 'column' }}>
                     <label style={{ fontSize: '1.125rem', fontWeight: '600', color: '#4a5568', marginBottom: '0.5rem' }}>미리보기</label>
                     <MarkdownPreviewer content={content} />
                 </div>
             </div>
 
-            {/* 버튼 영역 */}
+            {/* 버튼 */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', spaceX: '1rem', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingRight: '3rem' }}>
                 <button
                     onClick={onCancel}
-                    style={{ padding: '0.5rem 1.5rem', fontSize: '1.125rem', fontWeight: '500', color: '#4a5568', backgroundColor: '#f7fafc', border: '1px solid #e2e8f0', borderRadius: '0.75rem', cursor: 'pointer', transition: 'all 0.15s ease-in-out', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', marginRight: '1rem' }}
+                    style={{ padding: '0.5rem 1.5rem', fontSize: '1.125rem', fontWeight: '500', color: '#4a5568', backgroundColor: '#f7fafc', border: '1px solid #e2e8f0', borderRadius: '0.75rem', cursor: 'pointer', marginRight: '1rem' }}
                     onMouseOver={(e) => e.target.style.backgroundColor = '#edf2f7'}
                     onMouseOut={(e) => e.target.style.backgroundColor = '#f7fafc'}
                 >
@@ -384,154 +373,111 @@ const WriteForm = ({ title, setTitle, tags, setTags, content, setContent, onCanc
                 </button>
                 <button
                     onClick={onSubmit}
-                    style={{ padding: '0.5rem 1.5rem', fontSize: '1.125rem', fontWeight: '500', color: '#ffffff', backgroundColor: '#40cc92ff', borderRadius: '0.75rem', cursor: 'pointer', transition: 'all 0.15s ease-in-out', boxShadow: '0 4px 6px -1px rgba(102, 126, 234, 0.3), 0 2px 4px -1px rgba(102, 126, 234, 0.2)', opacity: (!title || !content) ? '0.6' : '1' }}
-                    onMouseOver={(e) => { if (!e.target.disabled) e.target.style.backgroundColor = '#419572ff'; }}
-                    onMouseOut={(e) => { if (!e.target.disabled) e.target.style.backgroundColor = '#3a8666ff'; }}
+                    style={{ padding: '0.5rem 1.5rem', fontSize: '1.125rem', fontWeight: '500', color: '#ffffff', backgroundColor: '#40cc92ff', borderRadius: '0.75rem', cursor: 'pointer', opacity: (!title || !content) ? '0.6' : '1' }}
                     disabled={!title || !content}
                 >
-                    작성 완료
+                    수정 완료
                 </button>
             </div>
         </div>
     );
 };
 
-
 // ===============================================
-// 4. App Component (Root)
+// EditPage Component
 // ===============================================
-
-export default function App() {
+export default function EditPage() {
+    const { keyword } = useParams(); // URL에서 글 식별자
     const navigate = useNavigate();
+
     const [title, setTitle] = useState('');
-    const [tags, setTags] = useState([]); // 태그 필드는 요청 스펙에 없으나 UI 상 존재하여 유지
+    const [tags, setTags] = useState([]);
     const [content, setContent] = useState('');
-    const [page, setPage] = useState('write');
     const [markedLoaded, setMarkedLoaded] = useState(false);
 
-
-    // marked.js 동적 로드 (가장 중요!)
+    // marked.js 동적 로드
     useEffect(() => {
         const scriptUrl = 'https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js';
         const existingScript = document.querySelector(`script[src="${scriptUrl}"]`);
-
         if (!existingScript) {
             const script = document.createElement('script');
             script.src = scriptUrl;
-            script.onload = () => {
-                console.log('marked.js loaded successfully.');
-                setMarkedLoaded(true);
-            };
-            script.onerror = () => {
-                console.error('Failed to load marked.js.');
-                setMarkedLoaded(true);
-            };
+            script.onload = () => setMarkedLoaded(true);
+            script.onerror = () => setMarkedLoaded(true);
             document.head.appendChild(script);
-        } else {
-            // 이미 로드되어 있다면 바로 상태 업데이트
-            setMarkedLoaded(true);
-        }
+        } else setMarkedLoaded(true);
     }, []);
 
+    // 기존 글 데이터 로드
+    useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const userToken = localStorage.getItem('authToken');
+                const res = await fetch(`http://127.0.0.1:8080/api/mima.wiki/w/${keyword}`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
 
-    const handleNavigateToMain = () => {
-        navigate('/main');
-    };
+                if (res.ok) {
+                    const result = await res.json();
+                    const post = result.data; // 핵심: data 안에 글 내용이 들어있음
+                    setTitle(post.keyword || '');
+                    setContent(post.markdown || '');
+                    setTags(post.tags || []);
+                    console.log("초기 태그 값:", post.tags);
+                } else {
+                    console.error('Failed to fetch post', res.status);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchPost();
+    }, [keyword]);
+
+
+    const handleNavigateToMain = () => navigate('/main');
 
     const handleSubmit = async () => {
         const userToken = localStorage.getItem('authToken');
-        if (!window.marked || typeof window.marked.parse !== 'function') {
-            console.error('Marked.js is not loaded or available for parsing.');
-            alert('마크다운 파서를 로드하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-            return;
-        }
+        if (!window.marked || typeof window.marked.parse !== 'function') return;
 
-        // 1. marked.js를 사용하여 마크다운을 HTML로 변환합니다.
-        window.marked.setOptions({ gfm: true, breaks: true });
         const htmlContent = window.marked.parse(content || "");
-
-        // 2. 요청 스펙에 맞는 JSON 본문을 생성합니다.
-        const requestBody = {
-            keyword: title,     // 요청 필드: keyword (글 제목)
-            markdown: content,  // 요청 필드: markdown (마크다운 형식)
-            content: htmlContent, // 요청 필드: content (변환된 HTML 문서) - **정확한 구현**
-            tags: tags 
-        };
-
-        console.log('Submitting Post with Body:', requestBody);
+        const requestBody = { keyword: title, markdown: content, content: htmlContent };
 
         try {
-            const response = await fetch('http://127.0.0.1:8080/api/mima.wiki/write', {
-                method: 'POST',
+            const res = await fetch(`http://127.0.0.1:8080/api/mima.wiki/w/${keyword}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${userToken}`,
                 },
                 body: JSON.stringify(requestBody),
             });
-
-            if (response.ok) {
-                const responseData = await response.json();
-                console.log('Post submitted successfully:', responseData);
-                alert('글 작성이 완료되었습니다.');
-                navigate('/myPage'); // 성공 시 이동
+            if (res.ok) {
+                alert('글 수정 완료');
+                navigate('/myPage');
             } else {
-                const errorText = await response.text();
-                console.error('API submission failed. Status:', response.status, 'Body:', errorText);
-                alert(`글 작성 실패: ${response.status}. 서버 응답: ${errorText.substring(0, 100)}...`);
+                const errorText = await res.text();
+                alert(`수정 실패: ${res.status} - ${errorText.substring(0, 100)}...`);
             }
-        } catch (error) {
-            console.error('Error submitting post:', error);
-            alert('글 작성 중 네트워크 오류가 발생했습니다.');
+        } catch (err) {
+            console.error(err);
+            alert('네트워크 오류 발생');
         }
     };
 
-    // 현재는 'write' 페이지 외 다른 페이지는 Mockup UI로 대체합니다.
-    if (page !== 'write') {
-        return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f7fafc' }}>
-                <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}>
-                    <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#2d3748' }}>Mock Page: {page.toUpperCase()}</h1>
-                    <p style={{ color: '#4a5568', marginTop: '1rem' }}>글 작성 페이지로 돌아가시겠습니까?</p>
-                    <button
-                        onClick={() => navigate('/write')}
-                        style={{ marginTop: '1.5rem', padding: '0.5rem 1rem', backgroundColor: '#667eea', color: '#ffffff', borderRadius: '0.5rem', cursor: 'pointer', transition: 'background-color 0.15s ease-in-out' }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#5a67d8'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#667eea'}
-                    >
-                        글 작성으로 이동
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // WritePage (App) Main Render
     return (
-        <div style={{
-            minHeight: '100vh',
-            backgroundColor: '#f9fafb',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            padding: '3rem 0',
-            fontFamily: 'Inter, sans-serif',
-            width: '100%'
-        }}>
-            <style>{globalStyles}</style> {/* 전역 스타일 주입 */}
+        <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '3rem 0', fontFamily: 'Inter, sans-serif', width: '100%' }}>
+            <style>{globalStyles}</style>
 
-            <div style={{
-                width: '100%',
-                maxWidth: '2000px',
-                padding: '0 1rem',
-            }}>
-                {/* marked.js가 로드되지 않으면 로딩 메시지 표시 */}
+            <div style={{ width: '100%', maxWidth: '2000px', padding: '0 1rem' }}>
                 {!markedLoaded ? (
                     <div style={{ textAlign: 'center', padding: '5rem', fontSize: '1.5rem', color: '#4a5568' }}>
                         마크다운 에디터를 로드 중입니다...
                     </div>
                 ) : (
-                    <WriteForm
+                    <EditForm
                         title={title}
                         setTitle={setTitle}
                         tags={tags}

@@ -7,6 +7,9 @@ import theme from './styles/theme';
 import SignUp from './pages/SignUp';
 import MainPage from './pages/MainPage';
 import WritePage from './pages/WritePage';
+import MyPage from './pages/MyPage';
+import EditPage from './pages/EditPage';
+  
 
 function App() {
   return (
@@ -16,6 +19,8 @@ function App() {
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/main" element={<MainPage />} /> 
         <Route path="/write" element={<WritePage/>}/>
+        <Route path="/myPage" element={<MyPage/>}/>
+        <Route path="/edit/:keyword" element={<EditPage />} />
       </Routes>
     </ThemeProvider>
   );

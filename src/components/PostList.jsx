@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; // [추가] 페이지 이동 훅
 
 const ListWrapper = styled.div`
   background-color: white;
@@ -16,7 +17,7 @@ const PostItem = styled.div`
   padding: 15px 0;
   border-bottom: 1px solid #eee;
   font-size: 16px;
-  cursor: pointer;
+  cursor: pointer; /* 클릭 가능한 손가락 커서 */
 
   &:last-child {
     border-bottom: none;
@@ -80,36 +81,55 @@ const PostList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // [추가] 페이지 이동을 위한 훅 생성
+  const navigate = useNavigate();
+
   const fetchPosts = async (page = 0) => {
     setLoading(true);
     setError(null);
+    const token = localStorage.getItem('authToken');
     
     try {
-      // Swagger에 따르면 pageable 파라미터가 필수입니다
+      if (!token) {
+        setError('로그인이 필요합니다.');
+        setLoading(false);
+        return;
+      }
+      
       const params = new URLSearchParams({
         page: page.toString(),
-        size: '10', // 한 페이지당 표시할 항목 수
-        sort: 'id,desc' // 최신순 정렬
+        size: '10',
+        sort: 'regTime,desc'
       });
-
+      
       const response = await fetch(
-        `http://127.0.0.1:8080/api/mima.wiki/article?${params.toString()}`
+        `http://127.0.0.1:8080/api/mima.wiki/article?${params.toString()}`,
+        {
+          headers: {
+            // [수정] Content-Type 추가 및 토큰 설정 방식 보강
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
+      
+      if (response.status === 403) {
+        // 403 에러 발생 시 토큰 삭제 후 에러 메시지 처리
+        localStorage.removeItem('authToken');
+        setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        return;
+      }
       
       if (!response.ok) {
         throw new Error(`API 호출 실패: ${response.status}`);
       }
       
       const responseData = await response.json();
-      console.log('API 응답:', responseData);
+      // console.log('API 응답:', responseData);
 
-      // Swagger 명세에 따르면 PageArticleRes를 직접 반환
-      // 하지만 실제로는 DataResponse 안에 data로 감싸져 있을 수 있음
-      const pageData = responseData.data || responseData;
-
-      setPosts(pageData.content || []);
-      setTotalPages(pageData.totalPages || 0);
-      setCurrentPage(pageData.number || 0);
+      setPosts(responseData.content || []);
+      setTotalPages(responseData.totalPages || 0);
+      setCurrentPage(responseData.number || 0);
     } catch (error) {
       console.error('Post fetch error:', error);
       setError(error.message);
@@ -122,6 +142,11 @@ const PostList = () => {
     fetchPosts();
   }, []);
 
+  // [추가] 리스트 아이템 클릭 시 상세 페이지로 이동하는 함수
+  const handleItemClick = (keyword) => {
+    navigate(`/post/${keyword}`);
+  };
+
   if (loading) {
     return (
       <ListWrapper>
@@ -133,7 +158,13 @@ const PostList = () => {
   if (error) {
     return (
       <ListWrapper>
-        <ErrorMessage>게시글을 불러오는데 실패했습니다: {error}</ErrorMessage>
+        <ErrorMessage>
+          {error} <br/><br/>
+          {/* 에러 발생 시 다시 로그인하도록 안내 버튼 추가 */}
+          <button onClick={() => navigate('/')} style={{padding:'5px 10px', cursor:'pointer'}}>
+            로그인 페이지로 이동
+          </button>
+        </ErrorMessage>
       </ListWrapper>
     );
   }
@@ -149,7 +180,11 @@ const PostList = () => {
   return (
     <ListWrapper>
       {posts.map(post => (
-        <PostItem key={post.id}>
+        <PostItem 
+          key={post.id}
+          // [추가] 클릭 이벤트 연결
+          onClick={() => handleItemClick(post.keyword)}
+        >
           <PostTitle>{post.keyword}</PostTitle>
           <PostDate>{new Date(post.regTime).toLocaleDateString('ko-KR')}</PostDate>
         </PostItem>

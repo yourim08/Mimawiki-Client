@@ -9,6 +9,8 @@ import MainPage from './pages/MainPage';
 import WritePage from './pages/WritePage';
 import MyPage from './pages/MyPage';
 import EditPage from './pages/EditPage';
+import PostDetailPage from './pages/PostDetailPage';
+
   
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/main" element={<MainPage />} /> 
+        <Route path="/post/:keyword" element={<PostDetailPage />} />
         <Route path="/write" element={<WritePage/>}/>
         <Route path="/myPage" element={<MyPage/>}/>
         <Route path="/edit/:keyword" element={<EditPage />} />
